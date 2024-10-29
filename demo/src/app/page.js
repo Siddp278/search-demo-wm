@@ -14,8 +14,9 @@ export default function Home() {
     const fetchData = async () => {
       setLoading(true);
       const res = await axios.get(`/api?page=${page}`);
-      setItems((prevItems) => [...prevItems, ...res.data.items]);
-      setFilteredItems((prevItems) => [...prevItems, ...res.data.items]);
+      const newItems = [...items, ...res.data.items];
+      setItems(newItems);
+      setFilteredItems(newItems);
       setLoading(false);
     };
     if (!query) {
@@ -29,9 +30,9 @@ export default function Home() {
     if (e.target.value) {
       const filtered = items.filter(
         (item) =>
-          item.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-          item.description.toLowerCase().includes(e.target.value.toLowerCase()) ||
-          item.price.toString().includes(e.target.value)
+          item.name.toLowerCase().startsWith(e.target.value.toLowerCase(), 0) ||
+          item.description.toLowerCase().includes(e.target.value.toLowerCase(), 0) ||
+          item.price.toString().startsWith(e.target.value, 0)
       );
       setFilteredItems(filtered);
     } else {
@@ -52,6 +53,7 @@ export default function Home() {
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
+    // Crrectively need this clean-up here.
     return () => window.removeEventListener('scroll', handleScroll);
   }, [query]); // Depend on query so it re-evaluates on search change
 
@@ -73,7 +75,7 @@ export default function Home() {
             <div key={product.id} className="group relative">
               <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
                 <img
-                  alt={product.description} // Replace with `product.imageAlt` if available
+                  alt={product.description} 
                   src={product.image || 'https://via.placeholder.com/150'} // Placeholder for images
                   className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                 />
@@ -92,9 +94,9 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
-        {loading && !query && <p>Loading more items...</p>}
-      </div>
+       
+    </div>
+    </div>
     </div>
   );
 }
